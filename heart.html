@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>打火机与公主裙 · 爱心</title>
+<style>
+*{margin:0;padding:0;}
+body{
+  background:#000;
+  overflow:hidden;
+}
+canvas{
+  display:block;
+  margin:0 auto;
+}
+</style>
+</head>
+<body>
+<canvas id="heart"></canvas>
+<script>
+const canvas = document.getElementById('heart');
+const ctx = canvas.getContext('2d');
+function resize(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize',resize);
+
+let points = [];
+const scale = 12;
+// 爱心函数
+for(let t=0;t<2*Math.PI;t+=0.01){
+  let x = 16*Math.pow(Math.sin(t),3);
+  let y = 13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);
+  points.push({x:x*scale,y:-y*scale});
+}
+
+let particles = [];
+class Particle{
+  constructor(x,y){
+    this.x = canvas.width/2 + x;
+    this.y = canvas.height/2 + y;
+    this.r = Math.random()*2+1;
+    this.vx = (Math.random()-0.5)*2;
+    this.vy = (Math.random()-0.5)*2;
+    this.alpha = 1;
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r,0,2*Math.PI);
+    ctx.fillStyle=`rgba(255,20,60,${this.alpha})`;
+    ctx.fill();
+  }
+  update(){
+    this.x += this.vx;
+    this.y += this.vy;
+    this.alpha -= 0.008;
+  }
+}
+
+function createHeart(){
+  for(let p of points){
+    if(Math.random()>0.7){
+      particles.push(new Particle(p.x,p.y));
+    }
+  }
+}
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  createHeart();
+  for(let i=particles.length-1;i>=0;i--){
+    particles[i].draw();
+    particles[i].update();
+    if(particles[i].alpha <=0){
+      particles.splice(i,1);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
